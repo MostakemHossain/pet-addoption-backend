@@ -42,7 +42,7 @@ const createUser = async (req: any) => {
 };
 
 const getAllUsers = async (params: any, options: any) => {
-  const { limit, sortBy, sortOrder, skip } =
+  const { limit, sortBy, page, sortOrder, skip } =
     paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = params;
   const andConditions: Prisma.UserWhereInput[] = [];
@@ -84,8 +84,29 @@ const getAllUsers = async (params: any, options: any) => {
         : {
             createdAt: "desc",
           },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      profilePhoto: true,
+      isDeleted: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
-  return result;
+  const total = await prisma.user.count({
+    where: whereConditions,
+  });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
 };
 
 const getSingleUser = async (id: string) => {
