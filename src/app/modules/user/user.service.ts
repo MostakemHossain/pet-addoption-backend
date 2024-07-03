@@ -1,5 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import { paginationHelper } from "../../../helpers/paginationHelper";
+import { userSearchAbleFields } from "./user.constant";
 const prisma = new PrismaClient();
 
 const createUser = async (req: any) => {
@@ -39,8 +41,47 @@ const createUser = async (req: any) => {
   return createdUser;
 };
 
-const getAllUsers = async () => {
-  const result = await prisma.user.findMany();
+const getAllUsers = async (params: any, options: any) => {
+  const { limit, sortBy, sortOrder, skip } =
+    paginationHelper.calculatePagination(options);
+  const { searchTerm, ...filterData } = params;
+  const andConditions: Prisma.UserWhereInput[] = [];
+  if (searchTerm) {
+    andConditions.push({
+      OR: userSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: filterData[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.UserWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
   return result;
 };
 

@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import pick from "../../../shared/Pick";
+import { userFilterAbleFields } from "./user.constant";
 import { userServices } from "./user.service";
 
 const createUser = async (req: Request, res: Response) => {
@@ -19,7 +21,9 @@ const createUser = async (req: Request, res: Response) => {
 };
 const getAllUser = async (req: Request, res: Response) => {
   try {
-    const result = await userServices.getAllUsers();
+    const filters = pick(req.query, userFilterAbleFields);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+    const result = await userServices.getAllUsers(filters, options);
     res.status(201).json({
       success: true,
       message: "User Retrieved successfully",
