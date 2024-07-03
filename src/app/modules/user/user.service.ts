@@ -2,8 +2,10 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { paginationHelper } from "../../../helpers/paginationHelper";
 import { TPagination } from "../../interfaces/pagination";
-import { userSearchAbleFields } from "./user.constant";
+
+import { userSearchAbleFields, userSelectedFields } from "./user.constant";
 import { IUserFilterRequest } from "./user.interface";
+
 const prisma = new PrismaClient();
 
 const createUser = async (req: any) => {
@@ -27,17 +29,7 @@ const createUser = async (req: any) => {
       name: req.body.name,
       status: "ACTIVE",
     },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      status: true,
-      profilePhoto: true,
-      isDeleted: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: userSelectedFields,
   });
 
   return createdUser;
@@ -89,17 +81,7 @@ const getAllUsers = async (
         : {
             createdAt: "desc",
           },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      status: true,
-      profilePhoto: true,
-      isDeleted: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: userSelectedFields,
   });
   const total = await prisma.user.count({
     where: whereConditions,
@@ -120,17 +102,7 @@ const getSingleUser = async (id: string) => {
       id,
       isDeleted: false,
     },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      status: true,
-      profilePhoto: true,
-      isDeleted: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: userSelectedFields,
   });
   return result;
 };
@@ -142,6 +114,7 @@ const deleteAUser = async (id: string) => {
     data: {
       isDeleted: true,
     },
+    select: userSelectedFields,
   });
   return result;
 };
