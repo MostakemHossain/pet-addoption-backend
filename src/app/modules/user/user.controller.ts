@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import pick from "../../../shared/Pick";
 import sendResponse from "../../../shared/sendResponse";
 import { userFilterAbleFields } from "./user.constant";
 import { userServices } from "./user.service";
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await userServices.createUser(req);
     sendResponse(res, {
@@ -15,14 +15,10 @@ const createUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: true,
-      message: error.message || "Something went wrong",
-      error: error,
-    });
+    next(error);
   }
 };
-const getAllUser = async (req: Request, res: Response) => {
+const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const filters = pick(req.query, userFilterAbleFields);
     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
@@ -35,14 +31,14 @@ const getAllUser = async (req: Request, res: Response) => {
       data: result.data,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: true,
-      message: error.message || "Something went wrong",
-      error: error,
-    });
+    next(error);
   }
 };
-const getSingleUser = async (req: Request, res: Response) => {
+const getSingleUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await userServices.getSingleUser(req.params.userId);
     sendResponse(res, {
@@ -52,14 +48,10 @@ const getSingleUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: true,
-      message: error.message || "Something went wrong",
-      error: error,
-    });
+    next(error);
   }
 };
-const deleteAUser = async (req: Request, res: Response) => {
+const deleteAUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await userServices.deleteAUser(req.params.userId);
     sendResponse(res, {
@@ -69,11 +61,7 @@ const deleteAUser = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
-      success: true,
-      message: error.message || "Something went wrong",
-      error: error,
-    });
+    next(error);
   }
 };
 export const userController = {

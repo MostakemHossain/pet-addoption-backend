@@ -1,5 +1,6 @@
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
+import globalErrorHandler from "./app/middlewares/golbalErrorHandler";
 import router from "./app/routes";
 const app: Application = express();
 
@@ -14,5 +15,8 @@ app.get("/", (req: Request, res: Response) => {
     message: "Pet Adoption API.........",
   });
 });
+
+// global error handler
+app.use(globalErrorHandler);
 
 export default app;
