@@ -25,6 +25,7 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "http-status": "^1.7.4",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "zod": "^3.23.8"
   }
 }
