@@ -16,7 +16,6 @@ const createUser = async (req: any) => {
     throw new Error("This user already exists");
   }
 
-  // Create the user
   const createdUser = await prisma.user.create({
     data: {
       email: req.body.email,
@@ -24,7 +23,6 @@ const createUser = async (req: any) => {
       name: req.body.name,
       status: "ACTIVE",
     },
-    // Specify which fields to select in the returned user object
     select: {
       id: true,
       name: true,
@@ -41,6 +39,12 @@ const createUser = async (req: any) => {
   return createdUser;
 };
 
+const getAllUsers = async () => {
+  const result = await prisma.user.findMany();
+  return result;
+};
+
 export const userServices = {
   createUser,
+  getAllUsers,
 };
