@@ -1,7 +1,9 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { paginationHelper } from "../../../helpers/paginationHelper";
+import { TPagination } from "../../interfaces/pagination";
 import { userSearchAbleFields } from "./user.constant";
+import { IUserFilterRequest } from "./user.interface";
 const prisma = new PrismaClient();
 
 const createUser = async (req: any) => {
@@ -41,7 +43,10 @@ const createUser = async (req: any) => {
   return createdUser;
 };
 
-const getAllUsers = async (params: any, options: any) => {
+const getAllUsers = async (
+  params: IUserFilterRequest,
+  options: TPagination
+) => {
   const { limit, sortBy, page, sortOrder, skip } =
     paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = params;
@@ -63,7 +68,7 @@ const getAllUsers = async (params: any, options: any) => {
     andConditions.push({
       AND: Object.keys(filterData).map((key) => ({
         [key]: {
-          equals: filterData[key],
+          equals: (filterData as any)[key],
         },
       })),
     });
