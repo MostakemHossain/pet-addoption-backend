@@ -1,14 +1,84 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongodb"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String            @unique
+  password     String
+  role         UserRole          @default(USER)
+  status       UserStatus        @default(ACTIVE)
+  profilePhoto String?
+  isDeleted    Boolean           @default(false)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  requests     AdoptionRequest[]
+}
+
+model Pet {
+  id                   String            @id @default(auto()) @map("_id") @db.ObjectId
+  name                 String
+  species              Species
+  breed                String
+  age                  Int
+  size                 Size
+  location             String
+  description          String
+  temperament          String
+  medicalHistory       String
+  adoptionRequirements String
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  requests             AdoptionRequest[]
+}
+
+model AdoptionRequest {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String   @db.ObjectId
+  petId                  String   @db.ObjectId
+  status                 Status   @default(PENDING)
+  petOwnershipExperience String
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  pet  Pet  @relation(fields: [petId], references: [id])
+}
+
+enum Size {
+  SMALL
+  MEDIUM
+  LARGE
+}
+
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum Species {
+  DOG
+  CAT
+  BIRD
+  REPTILE
+  OTHER
+}
+
+enum Status {
+  ACTIVE
+  BLOCKED
+  PENDING
 }
