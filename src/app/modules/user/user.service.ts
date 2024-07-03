@@ -46,6 +46,9 @@ const getAllUsers = async (params: any, options: any) => {
     paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = params;
   const andConditions: Prisma.UserWhereInput[] = [];
+  andConditions.push({
+    isDeleted: false,
+  });
   if (searchTerm) {
     andConditions.push({
       OR: userSearchAbleFields.map((field) => ({
@@ -85,7 +88,29 @@ const getAllUsers = async (params: any, options: any) => {
   return result;
 };
 
+const getSingleUser = async (id: string) => {
+  const result = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+      isDeleted: false,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      profilePhoto: true,
+      isDeleted: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return result;
+};
+
 export const userServices = {
   createUser,
   getAllUsers,
+  getSingleUser,
 };
