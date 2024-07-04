@@ -7,6 +7,8 @@ const loginUser = async (payload: ILoginUser) => {
   const userData = await prisma.user.findFirstOrThrow({
     where: {
       email: payload.email,
+      isDeleted: false,
+      status: "ACTIVE",
     },
   });
   const isCorrectPassword = await bcrypt.compare(
@@ -42,6 +44,41 @@ const loginUser = async (payload: ILoginUser) => {
     refreshToken,
   };
 };
+const refreshToken = async (token: string) => {
+  let decodedData;
+  try {
+    decodedData = jwtHelpers.verifyToken(
+      token,
+      "skkskskrh8rhr8d3938hfn8838rdlfio3fioew3"
+    );
+  } catch (error) {
+    throw new Error("You are not authorized");
+  }
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: decodedData.email,
+      isDeleted: false,
+      status: "ACTIVE",
+    },
+  });
+  const accessToken = jwtHelpers.generateToken(
+    {
+      id: userData.id,
+      email: userData.email,
+      role: userData.role,
+    },
+    "skkskskrh8rhr8d3938hfn8838r3",
+    "1d"
+  );
+
+  return {
+    id: userData.id,
+    name: userData.name,
+    email: userData.email,
+    accessToken,
+  };
+};
 export const authService = {
   loginUser,
+  refreshToken,
 };
