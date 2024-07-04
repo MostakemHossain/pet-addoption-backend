@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { ILoginUser } from "./auth.interface";
 const prisma = new PrismaClient();
 const loginUser = async (payload: ILoginUser) => {
@@ -16,29 +16,23 @@ const loginUser = async (payload: ILoginUser) => {
   if (!isCorrectPassword) {
     throw new Error("Incorrect password");
   }
-  const accessToken = jwt.sign(
+  const accessToken = jwtHelpers.generateToken(
     {
       id: userData.id,
       email: userData.email,
       role: userData.role,
     },
     "skkskskrh8rhr8d3938hfn8838r3",
-    {
-      algorithm: "HS256",
-      expiresIn: "1d",
-    }
+    "1d"
   );
-  const refreshToken = jwt.sign(
+  const refreshToken = jwtHelpers.generateToken(
     {
       id: userData.id,
       email: userData.email,
       role: userData.role,
     },
     "skkskskrh8rhr8d3938hfn8838rdlfio3fioew3",
-    {
-      algorithm: "HS256",
-      expiresIn: "30d",
-    }
+    "30d"
   );
   return {
     id: userData.id,
