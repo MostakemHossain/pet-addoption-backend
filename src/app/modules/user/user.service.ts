@@ -1,15 +1,25 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
 import { paginationHelper } from "../../../helpers/paginationHelper";
 import { TPagination } from "../../interfaces/pagination";
-
-import config from "../../../config";
+import bcrypt from "bcrypt"
+import { fileUploader } from "../../../shared/fileUpload";
 import { userSearchAbleFields, userSelectedFields } from "./user.constant";
 import { IUserFilterRequest } from "./user.interface";
+import config from "../../../config";
 
 const prisma = new PrismaClient();
 
 const createUser = async (req: any) => {
+  const file = req.file;
+  if (file) {
+    const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
+    req.body.profilePhoto = uploadToCloudinary?.secure_url;
+  }
+  const userExists = await prisma.user.findUnique({
+    where: {
+      email: req.body.email,
+    },
+  });
   const hashedPassword = await bcrypt.hash(
     req.body.password,
     Number(config.bcrypt_salt_rounds)
@@ -31,6 +41,7 @@ const createUser = async (req: any) => {
       email: req.body.email,
       password: hashedPassword,
       name: req.body.name,
+      profilePhoto: req.body.profilePhoto,
       status: "ACTIVE",
     },
     select: userSelectedFields,
