@@ -70,10 +70,26 @@ const updateMyProfile = catchAsync(
     });
   }
 );
+
+const updateUserRoleStatus = catchAsync(
+  async (req: CustomRequest, res: Response) => {
+    const result = await userServices.updateUserRoleStatus(
+      req.params.userId,
+      req.body
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Updated User Role,status Successfully",
+      data: result,
+    });
+  }
+);
 export const userController = {
   createUser,
   getAllUser,
   getSingleUser,
   deleteAUser,
   updateMyProfile,
+  updateUserRoleStatus,
 };

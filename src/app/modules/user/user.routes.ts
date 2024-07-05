@@ -16,7 +16,11 @@ router.post(
     return userController.createUser(req, res, next);
   }
 );
-router.get("/", userController.getAllUser);
+router.get(
+  "/",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  userController.getAllUser
+);
 router.get("/:userId", userController.getSingleUser);
 router.delete("/:userId", userController.deleteAUser);
 
@@ -28,6 +32,12 @@ router.patch(
     req.body = JSON.parse(req.body.data);
     return userController.updateMyProfile(req, res, next);
   }
+);
+
+router.patch(
+  "/update-role-status/:userId",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  userController.updateUserRoleStatus
 );
 
 export const userRoutes = router;

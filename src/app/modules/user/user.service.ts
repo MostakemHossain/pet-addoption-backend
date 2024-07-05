@@ -169,10 +169,20 @@ const updateMyProfile = async (user: any, req: CustomRequest) => {
   return result;
 };
 
+const updateUserRoleStatus = async (userId: string, payload: any) => {
+  const result = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: payload,
+  });
+  return result;
+};
 export const userServices = {
   createUser,
   getAllUsers,
   getSingleUser,
   deleteAUser,
   updateMyProfile,
+  updateUserRoleStatus,
 };

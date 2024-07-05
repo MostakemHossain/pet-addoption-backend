@@ -1,5 +1,5 @@
 export const userSearchAbleFields = ["email", "name"];
-export const userFilterAbleFields = ["name", "email", "searchTerm"];
+export const userFilterAbleFields = ["name", "email", "searchTerm", "status"];
 
 export const userSelectedFields = {
   id: true,
