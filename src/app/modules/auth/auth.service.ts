@@ -25,7 +25,7 @@ const loginUser = async (payload: ILoginUser) => {
       email: userData.email,
       role: userData.role,
     },
-    config.jwt__access_expire_in as string,
+    config.jwt__access_secret as string,
     config.jwt__access_expire_in as string
   );
   const refreshToken = jwtHelpers.generateToken(
@@ -79,7 +79,40 @@ const refreshToken = async (token: string) => {
     accessToken,
   };
 };
+
+const changePassword = async (user: any, payload: any) => {
+  const userData = await prisma.user.findFirstOrThrow({
+    where: {
+      email: user.email,
+      status: "ACTIVE",
+      isDeleted: false,
+    },
+  });
+  const isCorrectPassword = await bcrypt.compare(
+    payload.oldPassword,
+    userData.password
+  );
+  if (!isCorrectPassword) {
+    throw new Error("Incorrect password");
+  }
+  const hashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds)
+  );
+  await prisma.user.update({
+    where: {
+      email: user.email,
+    },
+    data: {
+      password: hashedPassword,
+    },
+  });
+  return {
+    message: "Password changed successfully",
+  };
+};
 export const authService = {
   loginUser,
   refreshToken,
+  changePassword,
 };

@@ -3,13 +3,17 @@ import bcrypt from "bcrypt";
 import { paginationHelper } from "../../../helpers/paginationHelper";
 import { TPagination } from "../../interfaces/pagination";
 
+import config from "../../../config";
 import { userSearchAbleFields, userSelectedFields } from "./user.constant";
 import { IUserFilterRequest } from "./user.interface";
 
 const prisma = new PrismaClient();
 
 const createUser = async (req: any) => {
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const hashedPassword = await bcrypt.hash(
+    req.body.password,
+    Number(config.bcrypt_salt_rounds)
+  );
 
   // Check if user already exists
   const existingUser = await prisma.user.findUnique({
