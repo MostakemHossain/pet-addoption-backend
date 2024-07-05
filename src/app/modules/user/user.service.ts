@@ -178,6 +178,16 @@ const updateUserRoleStatus = async (userId: string, payload: any) => {
   });
   return result;
 };
+
+const getMyProfile = async (user: any) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: user.id,
+    },
+    select: userSelectedFields,
+  });
+  return userData;
+};
 export const userServices = {
   createUser,
   getAllUsers,
@@ -185,4 +195,5 @@ export const userServices = {
   deleteAUser,
   updateMyProfile,
   updateUserRoleStatus,
+  getMyProfile,
 };

@@ -40,4 +40,10 @@ router.patch(
   userController.updateUserRoleStatus
 );
 
+router.get(
+  "/profile/me",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
+  userController.getMyProfile
+);
+
 export const userRoutes = router;
