@@ -22,6 +22,12 @@ const createUserValidationSchema = z.object({
       "Password must contain at least one special character"
     ),
 });
+
+const updateUserValidationSchema = z.object({
+  name: z.string({}).optional(),
+  email: z.string().email({}).optional(),
+});
 export const userValidation = {
   createUserValidationSchema,
+  updateUserValidationSchema,
 };

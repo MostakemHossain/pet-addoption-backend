@@ -6,6 +6,10 @@ import sendResponse from "../../../shared/sendResponse";
 import { userFilterAbleFields } from "./user.constant";
 import { userServices } from "./user.service";
 
+export interface CustomRequest extends Request {
+  user?: any;
+  // file?: IFile;
+}
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await userServices.createUser(req);
@@ -53,9 +57,23 @@ const deleteAUser = catchAsync(
     });
   }
 );
+
+const updateMyProfile = catchAsync(
+  async (req: CustomRequest, res: Response) => {
+    const user = req.user;
+    const result = await userServices.updateMyProfile(user, req);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "My Profile Updated Successfully",
+      data: result,
+    });
+  }
+);
 export const userController = {
   createUser,
   getAllUser,
   getSingleUser,
   deleteAUser,
+  updateMyProfile,
 };

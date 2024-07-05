@@ -1,11 +1,12 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import { paginationHelper } from "../../../helpers/paginationHelper";
-import { TPagination } from "../../interfaces/pagination";
-import bcrypt from "bcrypt"
-import { fileUploader } from "../../../shared/fileUpload";
-import { userSearchAbleFields, userSelectedFields } from "./user.constant";
-import { IUserFilterRequest } from "./user.interface";
+import bcrypt from "bcrypt";
 import config from "../../../config";
+import { paginationHelper } from "../../../helpers/paginationHelper";
+import { fileUploader } from "../../../shared/fileUpload";
+import { TPagination } from "../../interfaces/pagination";
+import { userSearchAbleFields, userSelectedFields } from "./user.constant";
+import { CustomRequest } from "./user.controller";
+import { IUserFilterRequest } from "./user.interface";
 
 const prisma = new PrismaClient();
 
@@ -133,10 +134,45 @@ const deleteAUser = async (id: string) => {
   });
   return result;
 };
+const updateMyProfile = async (user: any, req: CustomRequest) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: user.id,
+      status: user.ACTIVE,
+    },
+  });
+
+  if (!userData) {
+    throw new Error("User does not exist!");
+  }
+
+  const file = req.file;
+
+  if (file) {
+    const uploadedProfileImage = await fileUploader.uploadToCloudinary(file);
+    if (uploadedProfileImage && uploadedProfileImage.secure_url) {
+      req.body.profilePhoto = uploadedProfileImage.secure_url;
+    } else {
+      throw new Error("Profile image upload failed!");
+    }
+  }
+  const result = await prisma.user.update({
+    where: {
+      email: user.email,
+    },
+    data: {
+      email: req?.body?.email,
+      name: req?.body?.name,
+      profilePhoto: req?.body?.profilePhoto,
+    },
+  });
+  return result;
+};
 
 export const userServices = {
   createUser,
   getAllUsers,
   getSingleUser,
   deleteAUser,
+  updateMyProfile,
 };
