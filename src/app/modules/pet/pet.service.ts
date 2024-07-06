@@ -4,6 +4,8 @@ import { paginationHelper } from "../../../helpers/paginationHelper";
 import { fileUploader } from "../../../shared/fileUpload";
 import { TPagination } from "../../interfaces/pagination";
 
+import httpStatus from "http-status";
+import AppError from "../../../errors/AppError";
 import { petSearchAbleFields } from "./pet.constant";
 import { IPetFilterRequest } from "./pet.interface";
 const prisma = new PrismaClient();
@@ -193,7 +195,10 @@ const updatePetProfile = async (
   });
   //@ts-ignore
   if (isUserIdAndPetUserIdMatch.userId !== user.id) {
-    throw new Error("You are not authorized to update this pet");
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You are not authorized to update this pet"
+    );
   }
   const result = await prisma.pet.update({
     where: {

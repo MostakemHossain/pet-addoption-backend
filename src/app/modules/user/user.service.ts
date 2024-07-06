@@ -1,6 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import httpStatus from "http-status";
 import config from "../../../config";
+import AppError from "../../../errors/AppError";
 import { paginationHelper } from "../../../helpers/paginationHelper";
 import { fileUploader } from "../../../shared/fileUpload";
 import { TPagination } from "../../interfaces/pagination";
@@ -34,7 +36,7 @@ const createUser = async (req: any) => {
   });
 
   if (existingUser) {
-    throw new Error("This user already exists");
+    throw new AppError(httpStatus.BAD_REQUEST, "This user already exists");
   }
 
   const createdUser = await prisma.user.create({
@@ -143,7 +145,7 @@ const updateMyProfile = async (user: any, req: CustomRequest) => {
   });
 
   if (!userData) {
-    throw new Error("User does not exist!");
+    throw new AppError(httpStatus.BAD_REQUEST, "User does not exist!");
   }
 
   const file = req.file;
@@ -153,7 +155,10 @@ const updateMyProfile = async (user: any, req: CustomRequest) => {
     if (uploadedProfileImage && uploadedProfileImage.secure_url) {
       req.body.profilePhoto = uploadedProfileImage.secure_url;
     } else {
-      throw new Error("Profile image upload failed!");
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Profile image upload failed!"
+      );
     }
   }
   const result = await prisma.user.update({

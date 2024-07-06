@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import httpStatus from "http-status";
 import config from "../../../config";
+import AppError from "../../../errors/AppError";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { IChangePassword, ILoginUser } from "./auth.interface";
 import emailSender from "./sendMailer";
@@ -18,7 +20,7 @@ const loginUser = async (payload: ILoginUser) => {
     userData.password
   );
   if (!isCorrectPassword) {
-    throw new Error("Incorrect password");
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Incorrect password");
   }
   const accessToken = jwtHelpers.generateToken(
     {
@@ -54,7 +56,7 @@ const refreshToken = async (token: string) => {
       config.jwt__refresh_secret as string
     );
   } catch (error) {
-    throw new Error("You are not authorized");
+    throw new AppError(httpStatus.BAD_REQUEST, "You are not authorized");
   }
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
@@ -94,7 +96,7 @@ const changePassword = async (user: any, payload: IChangePassword) => {
     userData.password
   );
   if (!isCorrectPassword) {
-    throw new Error("Incorrect password");
+    throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Incorrect password");
   }
   const hashedPassword = await bcrypt.hash(
     payload.newPassword,
@@ -166,7 +168,7 @@ const resetPassword = async (
     config.reset_password_token as string
   );
   if (!isValidToken) {
-    throw new Error("Invalid credentials");
+    throw new AppError(httpStatus.NOT_FOUND, "Invalid credentials");
   }
   // hashed password
   const hashedPassword: string = await bcrypt.hash(
