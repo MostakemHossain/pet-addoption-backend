@@ -99,7 +99,21 @@ const getMyAdoptionRequest = async (
   };
 };
 
+const approvedAdoptionRequest = async (
+  payload: Partial<AdoptionRequest>,
+  id: string
+) => {
+  const result = await prisma.adoptionRequest.update({
+    where: {
+      id,
+    },
+    data: payload,
+  });
+  return result;
+};
+
 export const adoptionRequestService = {
   postAdoptionRequest,
   getMyAdoptionRequest,
+  approvedAdoptionRequest,
 };

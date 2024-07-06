@@ -17,5 +17,11 @@ router.get(
   auth(UserRole.USER),
   adoptionRequestController.getMyAdoptionRequest
 );
+router.put(
+  "/adoption-requests/:id",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validateRequest(adoptionRequestValidation.updateAdoptionRequestSchema),
+  adoptionRequestController.approvedAdoptionRequest
+);
 
 export const adoptionRequestRoutes = router;

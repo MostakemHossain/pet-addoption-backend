@@ -39,8 +39,23 @@ const getMyAdoptionRequest = catchAsync(
     });
   }
 );
+const approvedAdoptionRequest = catchAsync(
+  async (req: Request & { user?: any }, res: Response) => {
+    const result = await adoptionRequestService.approvedAdoptionRequest(
+      req.body,
+      req.params.id
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Adoption request updated successfully!",
+      data: result,
+    });
+  }
+);
 
 export const adoptionRequestController = {
   postAdoptionRequest,
   getMyAdoptionRequest,
+  approvedAdoptionRequest
 };

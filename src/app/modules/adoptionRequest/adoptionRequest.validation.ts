@@ -1,4 +1,5 @@
 import { z } from "zod";
+const petStatusEnum = z.enum(["APPROVED", "PENDING", "REJECTED"]);
 
 const postAdoptionRequestSchema = z.object({
   body: z.object({
@@ -6,7 +7,13 @@ const postAdoptionRequestSchema = z.object({
     petOwnershipExperience: z.string(),
   }),
 });
+const updateAdoptionRequestSchema = z.object({
+  body: z.object({
+    status: petStatusEnum,
+  }),
+});
 
 export const adoptionRequestValidation = {
   postAdoptionRequestSchema,
+  updateAdoptionRequestSchema,
 };
