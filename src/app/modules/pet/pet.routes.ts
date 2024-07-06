@@ -2,6 +2,7 @@ import { UserRole } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { fileUploader } from "../../../shared/fileUpload";
 import auth from "../../middlewares/auth";
+import validateRequest from "../../middlewares/validateRequest";
 import { petController } from "./pet.controller";
 import { petValidation } from "./pet.validation";
 const router = express.Router();
@@ -24,6 +25,11 @@ router.get(
   auth(UserRole.USER),
   petController.getMyAddPetPosts
 );
-router.put("/:petId", auth(UserRole.USER), petController.updatePetProfile);
+router.put(
+  "/:petId",
+  auth(UserRole.USER),
+  validateRequest(petValidation.updatePetValidationSchema),
+  petController.updatePetProfile
+);
 
 export const petRoutes = router;
