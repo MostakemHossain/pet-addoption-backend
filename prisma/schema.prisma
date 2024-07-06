@@ -55,6 +55,19 @@ model AdoptionRequest {
   pet  Pet  @relation(fields: [petId], references: [id])
 }
 
+model HelloContact {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String
+  phone     String
+  subject   String
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact")
+}
+
 enum Size {
   SMALL
   MEDIUM
