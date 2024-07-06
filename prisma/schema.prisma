@@ -43,16 +43,15 @@ model Pet {
 }
 
 model AdoptionRequest {
-  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId                 String   @db.ObjectId
-  petId                  String   @db.ObjectId
-  status                 Status   @default(PENDING)
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String    @db.ObjectId
+  petId                  String    @db.ObjectId
+  status                 petStatus @default(PENDING)
   petOwnershipExperience String
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
-  pet  Pet  @relation(fields: [petId], references: [id])
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  user                   User      @relation(fields: [userId], references: [id])
+  pet                    Pet       @relation(fields: [petId], references: [id])
 }
 
 model HelloContact {
@@ -101,4 +100,5 @@ enum Status {
 enum petStatus {
   APPROVED
   PENDING
+  REJECTED
 }
