@@ -17,6 +17,11 @@ router.get(
   auth(UserRole.USER),
   adoptionRequestController.getMyAdoptionRequest
 );
+router.get(
+  "/all-adoption-request",
+  auth(UserRole.SUPER_ADMIN, UserRole.SUPER_ADMIN),
+  adoptionRequestController.getallAdoptionRequest
+);
 router.put(
   "/adoption-requests/:id",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),

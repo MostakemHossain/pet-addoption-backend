@@ -54,8 +54,26 @@ const approvedAdoptionRequest = catchAsync(
   }
 );
 
+const getallAdoptionRequest = catchAsync(
+  async (req: Request & { user?: any }, res: Response) => {
+    const filters = pick(req.query, adoptionRequestFilterAbleFields);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+    const result = await adoptionRequestService.allAdoptionRequest(
+      filters,
+      options
+    );
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "get ALL adoption request Successfully!",
+      data: result,
+    });
+  }
+);
+
 export const adoptionRequestController = {
   postAdoptionRequest,
   getMyAdoptionRequest,
-  approvedAdoptionRequest
+  approvedAdoptionRequest,
+  getallAdoptionRequest,
 };
