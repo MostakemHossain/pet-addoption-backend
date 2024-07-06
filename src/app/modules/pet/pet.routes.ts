@@ -24,5 +24,6 @@ router.get(
   auth(UserRole.USER),
   petController.getMyAddPetPosts
 );
+router.put("/:petId", auth(UserRole.USER), petController.updatePetProfile);
 
 export const petRoutes = router;

@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Pet, Prisma, PrismaClient } from "@prisma/client";
 import { Request } from "express";
 import { paginationHelper } from "../../../helpers/paginationHelper";
 import { fileUploader } from "../../../shared/fileUpload";
@@ -181,8 +181,32 @@ const getMyAddPetPosts = async (
   };
 };
 
+const updatePetProfile = async (
+  petId: string,
+  payload: Partial<Pet>,
+  user: any
+) => {
+  const isUserIdAndPetUserIdMatch = await prisma.pet.findUniqueOrThrow({
+    where: {
+      id: petId,
+    },
+  });
+  //@ts-ignore
+  if (isUserIdAndPetUserIdMatch.userId !== user.id) {
+    throw new Error("You are not authorized to update this pet");
+  }
+  const result = await prisma.pet.update({
+    where: {
+      id: petId,
+    },
+    data: payload,
+  });
+  return result;
+};
+
 export const petService = {
   addAPet,
   getAllPet,
   getMyAddPetPosts,
+  updatePetProfile,
 };

@@ -26,7 +26,8 @@ const getAllPet = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: httpStatus.OK,
     message: "Pets retrieved successfully",
-    data: result,
+    meta: result.meta,
+    data: result.data,
   });
 });
 const getMyAddPetPosts = catchAsync(
@@ -39,6 +40,23 @@ const getMyAddPetPosts = catchAsync(
       success: true,
       statusCode: httpStatus.OK,
       message: "Pets retrieved successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
+const updatePetProfile = catchAsync(
+  async (req: Request & { user?: any }, res: Response) => {
+    const user = req.user;
+    const result = await petService.updatePetProfile(
+      req.params.petId,
+      req.body,
+      user
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "my pets profile updated  successfully",
       data: result,
     });
   }
@@ -48,4 +66,5 @@ export const petController = {
   addAPet,
   getAllPet,
   getMyAddPetPosts,
+  updatePetProfile,
 };
