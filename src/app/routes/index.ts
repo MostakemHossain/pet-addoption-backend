@@ -1,4 +1,5 @@
 import express from "express";
+import { adoptionRequestRoutes } from "../modules/adoptionRequest/adoptionRequest.routes";
 import { authRoutes } from "../modules/auth/auth.routes";
 import { contactRoutes } from "../modules/contact/contact.routes";
 import { petRoutes } from "../modules/pet/pet.routes";
@@ -21,6 +22,10 @@ const moduleRoutes = [
   {
     path: "/contacts",
     route: contactRoutes,
+  },
+  {
+    path: "/adoption-request",
+    route: adoptionRequestRoutes,
   },
 ];
 
