@@ -29,8 +29,23 @@ const getAllPet = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getMyAddPetPosts = catchAsync(
+  async (req: Request & { user?: any }, res: Response) => {
+    const user = req.user;
+    const filters = pick(req.query, petFilterAbleFields);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+    const result = await petService.getMyAddPetPosts(filters, options, user);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Pets retrieved successfully",
+      data: result,
+    });
+  }
+);
 
 export const petController = {
   addAPet,
   getAllPet,
+  getMyAddPetPosts,
 };

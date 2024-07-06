@@ -109,7 +109,80 @@ const getAllPet = async (params: IPetFilterRequest, options: TPagination) => {
   };
 };
 
+const getMyAddPetPosts = async (
+  params: IPetFilterRequest,
+  options: TPagination,
+  user: any
+) => {
+  const { limit, sortBy, page, sortOrder, skip } =
+    paginationHelper.calculatePagination(options);
+  const { searchTerm, ...filterData } = params;
+  const andConditions: Prisma.PetWhereInput[] = [];
+  andConditions.push({
+    // @ts-ignore
+    userId: user.id,
+  });
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: petSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => {
+        let value = (filterData as any)[key];
+        if (key === "age") {
+          value = parseInt(value, 10);
+        }
+        return {
+          [key]: {
+            equals: value,
+          },
+        };
+      }),
+    });
+  }
+
+  const whereConditions: Prisma.PetWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.pet.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+
+  const total = await prisma.pet.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 export const petService = {
   addAPet,
   getAllPet,
+  getMyAddPetPosts,
 };

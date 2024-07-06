@@ -19,5 +19,10 @@ router.post(
 );
 
 router.get("/all", petController.getAllPet);
+router.get(
+  "/my-pet-posts",
+  auth(UserRole.USER),
+  petController.getMyAddPetPosts
+);
 
 export const petRoutes = router;
