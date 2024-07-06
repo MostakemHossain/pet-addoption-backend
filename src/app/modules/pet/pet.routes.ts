@@ -9,7 +9,7 @@ const router = express.Router();
 router.post(
   "/add-a-pet",
   auth(UserRole.USER),
-  fileUploader.upload.array("file"),
+  fileUploader.upload.array("file", 3),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = petValidation.createPetValidationSchema.parse(
       JSON.parse(req.body.data)
@@ -17,5 +17,7 @@ router.post(
     return petController.addAPet(req, res, next);
   }
 );
+
+router.get("/all", petController.getAllPet);
 
 export const petRoutes = router;

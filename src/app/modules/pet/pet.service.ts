@@ -1,9 +1,14 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Request } from "express";
+import { paginationHelper } from "../../../helpers/paginationHelper";
 import { fileUploader } from "../../../shared/fileUpload";
+import { TPagination } from "../../interfaces/pagination";
+
+import { petSearchAbleFields } from "./pet.constant";
+import { IPetFilterRequest } from "./pet.interface";
 const prisma = new PrismaClient();
 
-const addAPet = async (req: Request) => {
+const addAPet = async (user: any, req: Request) => {
   const files = req.files as Express.Multer.File[];
 
   let petPhotos: string[] = [];
@@ -18,7 +23,7 @@ const addAPet = async (req: Request) => {
       .filter((result) => !!result)
       .map((result) => result!.secure_url);
   }
-
+  req.body.userId = user.id;
   const result = await prisma.pet.create({
     data: {
       ...req.body,
@@ -32,13 +37,79 @@ const addAPet = async (req: Request) => {
       temperament: req.body.temperament,
       medicalHistory: req.body.medicalHistory,
       adoptionRequirements: req.body.adoptionRequirements,
-      petPhoto: petPhotos, // Assign array of photo URLs
+      petPhoto: petPhotos,
     },
   });
 
   return result;
 };
 
+const getAllPet = async (params: IPetFilterRequest, options: TPagination) => {
+  const { limit, sortBy, page, sortOrder, skip } =
+    paginationHelper.calculatePagination(options);
+  const { searchTerm, ...filterData } = params;
+  const andConditions: Prisma.PetWhereInput[] = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: petSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => {
+        // Ensure that the type of the value matches the expected type
+        let value = (filterData as any)[key];
+        if (key === "age") {
+          value = parseInt(value, 10);
+        }
+        return {
+          [key]: {
+            equals: value,
+          },
+        };
+      }),
+    });
+  }
+
+  const whereConditions: Prisma.PetWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.pet.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+
+  const total = await prisma.pet.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 export const petService = {
   addAPet,
+  getAllPet,
 };
