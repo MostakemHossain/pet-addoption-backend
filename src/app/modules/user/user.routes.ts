@@ -45,5 +45,10 @@ router.get(
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
   userController.getMyProfile
 );
+router.put(
+  "/update-role/:id",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  userController.updateRole
+);
 
 export const userRoutes = router;
