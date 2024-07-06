@@ -69,7 +69,17 @@ const getAllContact = async (
   };
 };
 
+const deleteAContact = async (id: string) => {
+  const result = await prisma.helloContact.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const contactService = {
   postAContact,
   getAllContact,
+  deleteAContact,
 };
