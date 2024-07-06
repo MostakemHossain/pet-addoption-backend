@@ -33,6 +33,7 @@ model Pet {
   description          String
   temperament          String
   medicalHistory       String
+  petPhoto             String[]          @default([])
   adoptionRequirements String
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
@@ -73,7 +74,6 @@ enum Species {
   DOG
   CAT
   BIRD
-  REPTILE
   OTHER
 }
 
