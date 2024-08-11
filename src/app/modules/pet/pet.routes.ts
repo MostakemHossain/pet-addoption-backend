@@ -20,6 +20,7 @@ router.post(
 );
 
 router.get("/all", petController.getAllPet);
+
 router.get(
   "/my-pet-posts",
   auth(UserRole.USER),
@@ -28,7 +29,7 @@ router.get(
 router.put(
   "/:petId",
   auth(UserRole.USER),
-  validateRequest(petValidation.updatePetValidationSchema),
+  // validateRequest(petValidation.updatePetValidationSchema),
   petController.updatePetProfile
 );
 

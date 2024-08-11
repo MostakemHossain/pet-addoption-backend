@@ -9,6 +9,7 @@ import { petService } from "./pet.service";
 const addAPet = catchAsync(
   async (req: Request & { user?: any }, res: Response) => {
     const user = req.user;
+    console.log(req.files);
     const result = await petService.addAPet(user, req);
     sendResponse(res, {
       success: true,

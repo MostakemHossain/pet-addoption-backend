@@ -19,7 +19,7 @@ router.get(
 );
 router.get(
   "/all-adoption-request",
-  auth(UserRole.SUPER_ADMIN, UserRole.SUPER_ADMIN),
+  // auth(UserRole.SUPER_ADMIN, UserRole.SUPER_ADMIN),
   adoptionRequestController.getallAdoptionRequest
 );
 router.put(

@@ -103,11 +103,12 @@ const approvedAdoptionRequest = async (
   payload: Partial<AdoptionRequest>,
   id: string
 ) => {
+  
   const result = await prisma.adoptionRequest.update({
     where: {
       id,
     },
-    data: payload,
+    data: {status: payload.status},
   });
   return result;
 };

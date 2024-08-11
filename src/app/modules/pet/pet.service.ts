@@ -12,6 +12,7 @@ const prisma = new PrismaClient();
 
 const addAPet = async (user: any, req: Request) => {
   const files = req.files as Express.Multer.File[];
+  console.log(req.files)
 
   let petPhotos: string[] = [];
 
@@ -39,7 +40,7 @@ const addAPet = async (user: any, req: Request) => {
       temperament: req.body.temperament,
       medicalHistory: req.body.medicalHistory,
       adoptionRequirements: req.body.adoptionRequirements,
-      petPhoto: petPhotos,
+      // petPhoto: [],
     },
   });
 
